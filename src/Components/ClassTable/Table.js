@@ -22,10 +22,10 @@ class Table extends React.Component {
 
   deleteClass = (val, i) => {
     let { allClasses } = this.state
-    firebaseApp.firestore().collection(`${val.className}-${val.classSection}`).get().then(res => {
+    firebaseApp.firestore().collection(`${val.className}`).get().then(res => {
       res.forEach(doc => {
         doc.data()
-        firebaseApp.firestore().collection(`${val.className}-${val.classSection}`).doc(doc.id).delete()
+        firebaseApp.firestore().collection(`${val.className}`).doc(doc.id).delete()
 
       })
     })
@@ -59,16 +59,14 @@ class Table extends React.Component {
                   <th className="text-center">{this.props.heading[0]}</th>
                   <th className="text-center">{this.props.heading[1]}</th>
                   <th className="text-center">{this.props.heading[2]}</th>
-                  <th className="text-center">{this.props.heading[4]}</th>
                 </tr>
               </thead>
 
               <tbody>
                 {this.state.allClasses.map((val, ind) => {
                   return <tr key={ind}>
-                    <th scope="row" >{ind}</th>
+                    <th scope="row" >{ind + 1}</th>
                     <td>{val.className}</td>
-                    <td>{val.classSection}</td>
                     <td>{val.classTime}</td>
                     <td><DeleteIcon onClick={() => this.deleteClass(val, ind)} /></td>
                   </tr>
