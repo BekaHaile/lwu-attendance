@@ -11,7 +11,6 @@ import {
   AddClass,
   EditClass,
   Attendance,
-  lateAttendance,
   AddStudent,
   DeleteStudent,
   CheckStatus,
@@ -107,11 +106,6 @@ class BasicRouter extends React.Component {
               authed={this.state.auth}
               path="/attendance"
               component={Attendance}
-            />
-            <PrivateRoute
-              authed={this.state.auth}
-              path="/late-attendance"
-              component={lateAttendance}
             />
             <PrivateRoute
               authed={this.state.auth}

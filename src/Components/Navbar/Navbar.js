@@ -17,10 +17,8 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import DashboardIcon from "@material-ui/icons/Dashboard";
-import DeleteIcon from "@material-ui/icons/Delete";
 import ClassIcon from "@material-ui/icons/Class";
 import { Link } from "react-router-dom";
-import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import LocalLibraryIcon from "@material-ui/icons/LocalLibrary";
 

@@ -126,7 +126,7 @@ class AttendanceUi extends React.Component {
         } else {
           var flag = false;
           let student = res.data();
-          Object.entries(student.attendance).map((itemArray) => {
+          Object.entries(student.attendance).forEach((itemArray) => {
             if (itemArray[0] === today) {
               flag = true;
             }

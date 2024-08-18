@@ -16,7 +16,7 @@ const EditUi = ({ data }) => {
   let title = ["Class Name", "Class Time", "Delete Class"];
   return (
     <div style={{ marginTop: 50 }}>
-      <Grid justify="center" container spacing={3}>
+      <Grid justifyContent="center" container spacing={3}>
         <Grid item xs={10} sm={10} md={10} lg={10}>
           <List data={data} heading={title} />
         </Grid>

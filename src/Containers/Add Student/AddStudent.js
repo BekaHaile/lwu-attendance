@@ -79,7 +79,7 @@ class AddStudentUi extends React.Component {
   render() {
     return (
       <div>
-        <Grid justify="center" container spacing={4}>
+        <Grid justifyContent="center" container spacing={4}>
           <Grid item xs={11} md={8} lg={6}>
             <Paper>
               <InputPage

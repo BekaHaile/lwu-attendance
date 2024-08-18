@@ -115,7 +115,7 @@ class EditUI extends React.Component {
   render() {
     return (
       <div>
-        <Grid justify="flex-end" container spacing={3}>
+        <Grid justifyContent="flex-end" container spacing={3}>
           <Grid item xs={12} sm={12} md={6} lg={3}>
             <div className="button-wrapper">
               <span className="label">Upload Excel File</span>
@@ -131,7 +131,7 @@ class EditUI extends React.Component {
           </Grid>
         </Grid>
         <Paper name="custom">
-          <Grid justify="center" container spacing={4}>
+          <Grid justifyContent="center" container spacing={4}>
             <Grid item xs={12} sm={12} md={6} lg={3}>
               <InputPage
                 onChange={this.className}
