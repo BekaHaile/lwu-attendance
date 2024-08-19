@@ -208,40 +208,6 @@ class AttendanceUi extends React.Component {
             onCheckIn={this.onCheckIn}
             startCheckin={this.state.class}
           />
-
-          <Grid container>
-            <Grid item xs={12} sm={12} lg={6}>
-              <div className="searchbtn">
-                <MDBFormInline className="md-form mr-auto m-0">
-                  <input
-                    className="form-control mr-sm-2"
-                    value={this.state.number}
-                    disabled={this.state.disabled}
-                    onChange={(e) =>
-                      this.setState({
-                        number: e.target.value,
-                        searchDisabled: false,
-                      })
-                    }
-                    type="number"
-                    placeholder="Search"
-                    aria-label="Search"
-                  />
-                  <MDBBtn
-                    disabled={this.state.searchDisabled}
-                    onClick={this.search}
-                    color="dark"
-                    size="md"
-                    type="button"
-                    className="mr-auto"
-                  >
-                    Search
-                  </MDBBtn>
-                </MDBFormInline>
-              </div>
-            </Grid>
-            <Grid item xs={12} sm={12} lg={6}></Grid>
-          </Grid>
         </Paper>
 
         <div id="snackbar" className={this.state.name1}>

@@ -1,103 +1,145 @@
-import React from 'react'
-import { DenseAppBar, Paper, Clendar } from '../../Components'
-import Grid from '@material-ui/core/Grid';
-import { Typography } from '@material-ui/core';
-import firebaseApp from '../../Config/Firebase/Firebase'
-
-
+import React from "react";
+import { DenseAppBar, Paper } from "../../Components";
+import Grid from "@material-ui/core/Grid";
+import { Typography } from "@material-ui/core";
+import firebaseApp from "../../Config/Firebase/Firebase";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+} from "recharts";
 
 class Dashboard extends React.Component {
-    constructor() {
-        super()
-        this.state = {
-            name: '',
-            totalStudents: 0,
-            totalClass: 0,
-            totalSection: 0
-        }
-    }
+  constructor() {
+    super();
+    this.state = {
+      name: "",
+      totalStudents: 0,
+      totalClass: 0,
+      totalSection: 0,
+    };
+  }
 
-    async componentDidMount() {
-        let { totalStudents, totalClass, totalSection } = this.state
-        let totalS = 0
-        await firebaseApp.firestore().collection("classes").get().then(res => {
-            res.forEach(doc => {
-                let data = doc.data()
-                totalStudents = data.students
+  async componentDidMount() {
+    let { totalStudents, totalClass } = this.state;
 
-                if (data.className) {
-                    totalClass = totalClass + 1
-                }
-                if (data.classSection) {
-                    totalSection = totalSection + 1
-                }
-                totalS += totalStudents
-                this.setState({
-                    totalStudents: totalS,
-                    totalClass,
-                    totalSection
-                })
-            })
-        })
-    }
+    // Fetch class data
+    await firebaseApp
+      .firestore()
+      .collection("classes")
+      .get()
+      .then((res) => {
+        let classCount = 0;
+        res.forEach((doc) => {
+          let data = doc.data();
+          if (data.className) {
+            classCount += 1;
+          }
+        });
+        this.setState({
+          totalClass: classCount,
+        });
+      });
 
-    render() {
-        return (
-            <div>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} sm={12} md={6} lg={3}>
-                        <Paper>
-                            <Typography align='center' variant='h5'> Total Students</Typography>
-                            <Typography align='center' variant='h5'> {this.state.totalStudents} </Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={3}>
-                        <Paper>
-                            <Typography align='center' variant='h5'> Total Classes</Typography>
-                            <Typography align='center' variant='h5'> {this.state.totalClass} </Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={3}>
-                        <Paper>
-                            <Typography align='center' variant='h5'> Total Sections</Typography>
-                            <Typography align='center' variant='h5'>  {this.state.totalSection} </Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={3}>
-                        <Paper>
-                            <Typography align='center' variant='h5'> Total Coursers</Typography>
-                            <Typography align='center' variant='h5'> 08 </Typography>
-                        </Paper>
-                    </Grid>
+    // Fetch student data
+    await firebaseApp
+      .firestore()
+      .collection("students")
+      .get()
+      .then((res) => {
+        let studentCount = 0;
+        res.forEach((doc) => {
+          studentCount += 1;
+        });
+        this.setState({
+          totalStudents: studentCount,
+        });
+      });
+  }
 
-                    <Grid item xs={12} sm={12} md={12} lg={12}>
-                        <Clendar />
-                    </Grid>
+  render() {
+    const data = [
+      { name: "Classes", value: this.state.totalClass },
+      { name: "Students", value: this.state.totalStudents },
+    ];
 
+    const COLORS = ["#0088FE", "#00C49F"];
 
-                </Grid>
-            </div>
-        )
-    }
+    return (
+      <div>
+        <Grid container spacing={3}>
+          {/* Total Students */}
+          <Grid item xs={12} sm={6}>
+            <Paper>
+              <Typography align="center" variant="h5">
+                Total Students
+              </Typography>
+              <Typography align="center" variant="h5">
+                {this.state.totalStudents}
+              </Typography>
+            </Paper>
+          </Grid>
+          {/* Total Classes */}
+          <Grid item xs={12} sm={6}>
+            <Paper>
+              <Typography align="center" variant="h5">
+                Total Classes
+              </Typography>
+              <Typography align="center" variant="h5">
+                {this.state.totalClass}
+              </Typography>
+            </Paper>
+          </Grid>
+
+          {/* Bar Graph */}
+          <Grid item xs={12} sm={12}>
+            <Paper>
+              <Typography align="center" variant="h5">
+                Total Students & Classes (Bar Graph)
+              </Typography>
+              <BarChart
+                width={500}
+                height={300}
+                data={data}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#8884d8" />
+              </BarChart>
+            </Paper>
+          </Grid>
+        </Grid>
+      </div>
+    );
+  }
 }
-
 
 class Home extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      name: "",
+    };
+  }
 
-    constructor() {
-        super()
-        this.state = {
-            name: ''
-        }
-    }
-
-    render() {
-        return (
-            <div>
-                <DenseAppBar name="Dashboard" component={<Dashboard />} />
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div>
+        <DenseAppBar name="Dashboard" component={<Dashboard />} />
+      </div>
+    );
+  }
 }
 
-export default Home
+export default Home;
