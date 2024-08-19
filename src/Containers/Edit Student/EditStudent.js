@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DenseAppBar, InputPage } from "../../Components";
 import List from "../../Components/StudentTable/Table";
 import Grid from "@material-ui/core/Grid";
@@ -7,7 +7,7 @@ import firebaseApp from "../../Config/Firebase/Firebase";
 import { MDBBtn } from "mdbreact";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
-const EditUi = ({ data, isAttendance }) => {
+const EditUi = ({ data, isAttendance, onCheckIn, startCheckin }) => {
   const history = useHistory();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -18,8 +18,6 @@ const EditUi = ({ data, isAttendance }) => {
   const filteredData = data.filter((item) => {
     const fullName = `${item.studentName} ${item.fatherName}`.toLowerCase();
     const searchTermLower = searchTerm.toLowerCase();
-
-    console.log(searchTerm, "------", fullName.startsWith(searchTermLower));
 
     if (isNaN(searchTerm) && searchTerm.length > 0) {
       // Search by name
@@ -56,6 +54,8 @@ const EditUi = ({ data, isAttendance }) => {
             data={filteredData}
             heading={title}
             isAttendance={isAttendance}
+            onCheckIn={onCheckIn}
+            startCheckin={startCheckin}
           />
         </Grid>
         {!isAttendance && (
@@ -77,58 +77,45 @@ const EditUi = ({ data, isAttendance }) => {
   );
 };
 
-class EditStudent extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      allStudents: [],
-    };
-  }
+const EditStudent = ({ students, isAttendance, onCheckIn, startCheckin }) => {
+  const [allStudents, setAllStudents] = useState([]);
 
-  async componentDidMount() {
-    let { allStudents } = this.state;
-    if (this.props.students) {
-      allStudents = this.props.students;
-      this.setState({
-        allStudents,
-      });
-    } else
-      await firebaseApp
-        .firestore()
-        .collection("students")
-        .get()
-        .then((res) => {
-          res.forEach((doc) => {
-            let id = doc.id;
-            let data = doc.data();
-            data.id = id;
-            allStudents.push(data);
-            this.setState({
-              allStudents,
-            });
-          });
+  useEffect(() => {
+    const fetchStudents = async () => {
+      if (students) {
+        setAllStudents(students);
+      } else {
+        const studentDocs = await firebaseApp
+          .firestore()
+          .collection("students")
+          .get();
+        const fetchedStudents = studentDocs.docs.map((doc) => {
+          const data = doc.data();
+          return { ...data, id: doc.id };
         });
-  }
+        setAllStudents(fetchedStudents);
+      }
+    };
+    fetchStudents();
+  }, [students]);
 
-  render() {
-    return (
-      <div>
-        {this.props.isAttendance ? (
-          <EditUi data={this.state.allStudents} isAttendance={true} />
-        ) : (
-          <DenseAppBar
-            name="Students"
-            component={
-              <EditUi
-                data={this.state.allStudents}
-                isAttendance={this.props.isAttendance}
-              />
-            }
-          />
-        )}
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      {isAttendance ? (
+        <EditUi
+          data={allStudents}
+          isAttendance={true}
+          onCheckIn={onCheckIn}
+          startCheckin={startCheckin}
+        />
+      ) : (
+        <DenseAppBar
+          name="Students"
+          component={<EditUi data={allStudents} isAttendance={isAttendance} />}
+        />
+      )}
+    </div>
+  );
+};
 
 export default EditStudent;

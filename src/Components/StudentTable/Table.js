@@ -4,7 +4,13 @@ import firebaseApp from "../../Config/Firebase/Firebase";
 import Grid from "@material-ui/core/Grid";
 import { CheckBox } from "@material-ui/icons";
 
-const Table = ({ data = [], heading, isAttendance, onCheckIn }) => {
+const Table = ({
+  data = [],
+  heading,
+  isAttendance,
+  onCheckIn,
+  startCheckin,
+}) => {
   const [allStudents, setAllStudents] = useState(data);
   const [snackbar, setSnackbar] = useState({ show: false, message: "" });
 
@@ -52,7 +58,14 @@ const Table = ({ data = [], heading, isAttendance, onCheckIn }) => {
                   <td>{val.city}</td>
                   <td>
                     {isAttendance ? (
-                      <CheckBox onClick={() => onCheckIn(val)} />
+                      <CheckBox
+                        onClick={() =>
+                          startCheckin
+                            ? onCheckIn({ student: val, checkIn: true })
+                            : null
+                        }
+                        style={{ cursor: "pointer" }}
+                      />
                     ) : (
                       <DeleteIcon onClick={() => deleteStudent(val, ind)} />
                     )}

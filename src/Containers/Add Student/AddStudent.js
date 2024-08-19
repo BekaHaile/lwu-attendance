@@ -42,7 +42,7 @@ class AddStudentUi extends React.Component {
         .firestore()
         .collection("students")
         .doc(PhoneNumber)
-        .set(obj) // Using set() instead of add()
+        .set(obj)
         .then(() => {
           this.setState({
             message: "Student Added Successfully ✔️✔️",

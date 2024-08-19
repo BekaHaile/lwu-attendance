@@ -79,8 +79,7 @@ const DropdownPage = (props) => {
   };
 
   const options = props.list.map((val, ind) => ({
-    value: val,
-    label: val,
+    ...val,
     key: ind,
   }));
 

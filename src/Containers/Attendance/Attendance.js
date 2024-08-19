@@ -12,40 +12,33 @@ class AttendanceUi extends React.Component {
     this.state = {
       disabled: true,
       classesNames: [],
-      classesSections: [],
-      classesTime: [],
       class: "",
-      section: "",
-      time: "",
-      sec: true,
-      tim: true,
       start: true,
       name: "",
       name1: "snackbar",
       message: "",
-      change: false,
       searchDisabled: true,
     };
   }
 
   async componentDidMount() {
-    let { classesNames, classesSections, classesTime } = this.state;
+    let { classesNames } = this.state;
     await firebaseApp
       .firestore()
       .collection("classes")
       .get()
       .then((res) => {
-        res.forEach((doc) => {
+        res.forEach((doc, index) => {
           let id = doc.id;
           let data = doc.data();
           data.id = id;
-          classesNames.push(data.className);
-          classesSections.push(data.classSection);
-          classesTime.push(data.classTime);
+          classesNames.push({
+            value: data.id,
+            label: data.className,
+            key: index,
+          });
           this.setState({
             classesNames,
-            classesSections,
-            classesTime,
           });
         });
       });
@@ -55,7 +48,6 @@ class AttendanceUi extends React.Component {
     this.setState({
       disabled: false,
       start: true,
-      change: true,
     });
   };
 
@@ -66,15 +58,14 @@ class AttendanceUi extends React.Component {
       tim: true,
       start: true,
       clas: false,
-      change: false,
       class: "",
       section: "",
       time: "",
     });
   };
 
-  search = async () => {
-    let { number } = this.state;
+  onCheckIn = async ({ student, checkIn }) => {
+    let { phoneNumber } = student;
     var date = new Date();
 
     let months = [
@@ -107,80 +98,56 @@ class AttendanceUi extends React.Component {
       hour: "2-digit",
       minute: "2-digit",
     });
-    let today = date.toISOString().substring(0, 10);
-    await firebaseApp
-      .firestore()
-      .collection(`${this.state.class}-${this.state.section}`)
-      .doc(`${number}`)
-      .get()
-      .then((res) => {
-        if (res.data() === undefined) {
-          this.setState({
-            name1: "show",
-            message: "Student Data Not Found ❌ ❌ ❌ ",
-            number: "",
-          });
-          setTimeout(() => {
-            this.setState({ name1: "snackbar" });
-          }, 3000);
-        } else {
-          var flag = false;
-          let student = res.data();
-          Object.entries(student.attendance).forEach((itemArray) => {
-            if (itemArray[0] === today) {
-              flag = true;
-            }
-          });
 
-          if (flag === true) {
-            this.setState({
-              name: student.data.studentName,
-              fname: student.data.fatherName,
-              rollNum: student.data.rollNumber,
-              message: "Student Already marked ✔️",
-              name1: "show",
-              number: "",
-            });
-            setTimeout(() => {
-              this.setState({ name1: "snackbar" });
-            }, 3000);
-          } else {
-            console.log(student, "dsid");
-            firebaseApp
-              .firestore()
-              .collection(`${this.state.class}-${this.state.section}`)
-              .doc(`${number}`)
-              .set(
-                {
-                  attendance: {
-                    [today]: {
-                      attendance: "present",
-                      time: currentTime,
-                      day: saveDay,
-                      month: saveMonth,
-                    },
-                  },
+    if (checkIn) {
+      firebaseApp
+        .firestore()
+        .collection("classes")
+        .doc(this.state.class) // Reference to the specific class document
+        .set(
+          {
+            attendance: {
+              [phoneNumber]: {
+                student: {
+                  city: student.city,
+                  fatherName: student.fatherName,
+                  id: student.id,
+                  phoneNumber: student.phoneNumber,
+                  studentName: student.studentName,
                 },
-                { merge: true }
-              );
-            this.setState({
-              name: student.data.studentName,
-              fname: student.data.fatherName,
-              rollNum: student.data.rollNumber,
-              message: "Student marked Succesfully ✔️✔️✔️",
-              name1: "show",
-              number: "",
-            });
-            setTimeout(() => {
-              this.setState({ name1: "snackbar" });
-            }, 3000);
-          }
-        }
-      });
+                time: currentTime,
+                day: saveDay,
+                month: saveMonth,
+              },
+            },
+          },
+          { merge: true } // This will merge the attendance object with any existing data in the document
+        );
+    } else {
+      // Delete the attendance entry for the specific student
+      firebaseApp
+        .firestore()
+        .collection("classes")
+        .doc(this.state.class)
+        .set(
+          {
+            [`attendance.${phoneNumber}`]:
+              firebaseApp.firestore.FieldValue.delete(),
+          },
+          { merge: true }
+        );
+    }
 
     this.setState({
-      searchDisabled: true,
+      message: checkIn
+        ? "Student marked Succesfully ✔️✔️✔️"
+        : "Student removed from attendance xxx",
+      name1: "show",
+      number: "",
     });
+    setTimeout(() => {
+      this.setState({ name1: "snackbar" });
+    }, 3000);
   };
 
   render() {
@@ -210,7 +177,7 @@ class AttendanceUi extends React.Component {
                 />
               </div>
               <div className="mdbtn">
-                {this.state.change ? (
+                {this.state.class ? (
                   <MDBBtn
                     color="dark"
                     className="mb-3"
@@ -236,10 +203,14 @@ class AttendanceUi extends React.Component {
         </Paper>
 
         <Paper>
+          <EditStudent
+            isAttendance={true}
+            onCheckIn={this.onCheckIn}
+            startCheckin={this.state.class}
+          />
+
           <Grid container>
             <Grid item xs={12} sm={12} lg={6}>
-              <EditStudent isAttendance={true} />
-
               <div className="searchbtn">
                 <MDBFormInline className="md-form mr-auto m-0">
                   <input
